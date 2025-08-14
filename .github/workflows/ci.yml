@@ -1,0 +1,36 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [ main, dev ]
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    # Backend: Python
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: Install backend dependencies
+      run: |
+        cd backend
+        pip install -r requirements.txt
+        pytest --maxfail=1 --disable-warnings -q
+
+    # Frontend: Angular
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '20'
+
+    - name: Install frontend dependencies
+      run: |
+        cd frontend/web-app
+        npm ci
+        npm run build -- --configuration production
